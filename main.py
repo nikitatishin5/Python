@@ -81,3 +81,132 @@ def Task5_4():
     b.reverse()
     c = ''.join(b)
     print(c)
+
+def Task6_2():
+    #Дано целое число, не меньшее 2. Выведите его наименьший натуральный делитель, отличный от 1.
+    x = int(input())
+    for i in range(2, x+1):
+        if not x % i:
+            print(i)
+            break
+
+def Task7_8():
+    #Дан список, упорядоченный по неубыванию элементов в нем. Определите, сколько в нем различных элементов.
+    a = [int(i) for i in input().split()]
+    num_distinct = 1
+    for i in range(0, len(a) - 1):
+        if a[i] != a[i + 1]:
+            num_distinct += 1
+    print(num_distinct)
+
+def Task8_4():
+    #Дано действительное положительное число a и целое неотрицательное число n.
+#   Вычислите an не используя циклы, возведение в степень через ** и функцию math.pow(), а используя рекуррентное соотношение a^n=a⋅a^n-1.
+    def power(a, n):
+        if n==0:
+            return 1
+        return a*power(a, n-1)
+
+    a = int(input())
+    n = int(input())
+    print(power(a,n))
+
+def Task9_4():
+    #Дано число n. Создайте массив размером n×n и заполните его по следующему правилу. На главной диагонали должны быть
+   # записаны числа 0. На двух диагоналях, прилегающих к главной, числа 1. На следующих двух диагоналях числа 2, и т.д.
+    n = int(input())
+    a = [[0] * n for i in range(n)]
+    for i in range(n):
+        row = i*(-1)
+        for j in range(n):
+            if row <=0:
+                a[i][j] = row*(-1)
+            else:
+                a[i][j] = row
+            row+=1
+    for row in a:
+        print(' '.join([str(elem) for elem in row]))
+
+def Task10_3():
+    #Даны два списка чисел. Найдите все числа, которые входят как в первый, так и во второй список и выведите их
+    # в порядке возрастания.
+    a = set(int(i) for i in input().split())
+    b = set(int(i) for i in input().split())
+    c = sorted(a&b)
+    print(c)
+
+def Task11_4():
+    #В файловую систему одного суперкомпьютера проник вирус, который сломал контроль за правами
+# доступа к файлам. Для каждого файла известно, с какими действиями можно к нему обращаться:
+# запись W,
+# чтение R,
+# запуск X.
+# В первой строке содержится число N — количество файлов содержащихся в данной файловой системе.
+# В следующих N строчках содержатся имена файлов и допустимых с ними операций, разделенные пробелами.
+# Далее указано чиcло M — количество запросов к файлам. В последних M строках указан запрос вида Операция Файл.
+# К одному и тому же файлу может быть применено любое колличество запросов.
+#
+# Вам требуется восстановить контроль над правами доступа к файлам
+# (ваша программа для каждого запроса должна будет возвращать OK если над файлом выполняется допустимая операция,
+# или же Access denied, если операция недопустима.
+
+    a = int(input())
+    b = []
+    for i in range(a):
+        b.append(input().split())
+    
+
+    dictlist=[]
+
+    for i in range(len(b)):
+        if (len(b[i])-1) == 1:
+            dictlist.append({b[i][1]:b[i][0]})
+        elif (len(b[i])-1) == 2:
+             dictlist.append({b[i][1]:b[i][0],b[i][2]:b[i][0]})
+        elif (len(b[i])-1) == 3:
+             dictlist.append({b[i][1]:b[i][0],b[i][2]:b[i][0],b[i][3]:b[i][0]})
+    print(dictlist)
+
+    comdict = {'R':'read','W':'write','X':'execute'}
+    print(comdict)
+
+
+    a = int(input())
+    b = []
+    for i in range(a):
+        b.append(input().split())
+    print(b)
+    for i in range(len(b)):
+        if b[i][0]  == 'read':
+            try:
+                for j in range(len(dictlist)):
+                    it = list(dictlist[j].items())
+                    if it[0][1] == b[i][1]:
+                        if dictlist[j]['R'] == b[i][1]:
+                            print("OK")
+
+            except KeyError:
+                print('Access denied')
+
+
+        elif b[i][0] == 'write':
+            try:
+                for j in range(len(dictlist)):
+                    it = list(dictlist[j].items())
+                    if it[0][1] == b[i][1]:
+                        if dictlist[j]['W'] == b[i][1]:
+                            print("OK")
+            except KeyError:
+                print('Access denied')
+
+
+        elif b[i][0] == 'execute':
+            try:
+                for j in range(len(dictlist)):
+                    it = list(dictlist[j].items())
+                    if it[0][1] == b[i][1]:
+                        if dictlist[j]['X'] == b[i][1]:
+                            print("OK")
+
+            except KeyError:
+                print('Access denied')

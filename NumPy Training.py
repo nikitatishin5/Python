@@ -281,7 +281,204 @@ print("_______________________________________________")
 
 
 #np.diag(np.dot(A, B))
-print("_______________END____________________________")
+print("_______________DZ__5____________________________")
+
+
+Z = np.array([1,2,3,4,5])
+nz = 3
+Z0 = np.zeros(len(Z) + (len(Z)-1)*(nz))
+Z0[::nz+1] = Z
+print(Z0)
+print("_______________________________________________")
+vec = np.arange(25).reshape(5,5)
+vec[[0,1]] = vec[[1,0]]
+print(vec)
+print("_______________________________________________")
+faces = np.random.randint(0,100,(10,3))
+F = np.roll(faces.repeat(2,axis=1),-1,axis=1)
+F = F.reshape(len(F)*3,2)
+F = np.sort(F,axis=1)
+G = F.view( dtype=[('p0',F.dtype),('p1',F.dtype)] )
+G = np.unique(G)
+print(G)
+print("_______________________________________________")
+C = np.bincount([1,1,2,3,4,4,6])
+A = np.repeat(np.arange(len(C)), C)
+print(A)
+print("_______________________________________________")
+def moving_average(a, n=3):
+    ret = np.cumsum(a, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+    return ret[n - 1:] / n
+print(moving_average(np.arange(20), 3))
+print("_______________________________________________")
+
+from numpy.lib import stride_tricks
+def rolling(a, window):
+    shape = (a.size - window + 1, window)
+    strides = (a.itemsize, a.itemsize)
+    return stride_tricks.as_strided(a, shape=shape, strides=strides)
+Z = rolling(np.arange(10), 3)
+print(Z)
+
+print("_______________________________________________")
+Z = np.random.randint(0,2,100)
+np.logical_not(Z, out=Z)
+print(Z)
+
+print("_______________________________________________")
+
+def distance(P0, P1, p):
+    T = P1 - P0
+    L = (T**2).sum(axis=1)
+    U = -((P0[:,0] - p[...,0]) * T[:,0] + (P0[:,1] - p[...,1]) * T[:,1]) / L
+    U = U.reshape(len(U),1)
+    D = P0 + U * T - p
+    return np.sqrt((D**2).sum(axis=1))
+P0 = np.random.uniform(-10,10,(10,2))
+P1 = np.random.uniform(-10,10,(10,2))
+p  = np.random.uniform(-10,10,( 1,2))
+print(distance(P0, P1, p))
+
+print("_______________________________________________")
+Z = np.random.randint(0,10, (10,10))
+shape = (5,5)
+fill  = 0
+position = (1,1)
+
+R = np.ones(shape, dtype=Z.dtype)*fill
+P  = np.array(list(position)).astype(int)
+Rs = np.array(list(R.shape)).astype(int)
+Zs = np.array(list(Z.shape)).astype(int)
+
+R_start = np.zeros((len(shape),)).astype(int)
+R_stop  = np.array(list(shape)).astype(int)
+Z_start = (P - Rs//2)
+Z_stop  = (P + Rs//2)+Rs%2
+
+R_start = (R_start - np.minimum(Z_start, 0)).tolist()
+Z_start = (np.maximum(Z_start, 0)).tolist()
+R_stop = np.maximum(R_start, (R_stop - np.maximum(Z_stop-Zs,0))).tolist()
+Z_stop = (np.minimum(Z_stop,Zs)).tolist()
+
+r = [slice(start,stop) for start,stop in zip(R_start,R_stop)]
+z = [slice(start,stop) for start,stop in zip(Z_start,Z_stop)]
+R[r] = Z[z]
+print(Z)
+print(R)
+
+
+print("_______________________________________________")
+
+
+Z = np.random.uniform(0,1,(10,10))
+rank = np.linalg.matrix_rank(Z)
+
+print("_______________________________________________")
+Z = np.random.randint(0,10,50)
+print(np.bincount(Z).argmax())
+
+print("_______________________________________________")
+
+Z = np.random.randint(0,5,(10,10))
+n = 3
+i = 1 + (Z.shape[0] - n)
+j = 1 + (Z.shape[1] - n)
+C = stride_tricks.as_strided(Z, shape=(i, j, n, n), strides=Z.strides + Z.strides)
+print(C)
+
+
+print("_______________________________________________")
+
+
+
+
+p, n = 10, 20
+M = np.ones((p,n,n))
+V = np.ones((p,n,1))
+S = np.tensordot(M, V, axes=[[0, 2], [0, 1]])
+print(S)
+
+print("_______________________________________________")
+
+
+Z = np.ones((16,16))
+k = 4
+S = np.add.reduceat(np.add.reduceat(Z, np.arange(0, Z.shape[0], k), axis=0),
+                                       np.arange(0, Z.shape[1], k), axis=1)
+
+
+print("_______________________________________________")
+
+Z = np.arange(10000)
+np.random.shuffle(Z)
+n = 5
+
+print (Z[np.argpartition(-Z,n)[:n]])
+
+print("_______________________________________________")
+
+
+def cartesian(arrays):
+    arrays = [np.asarray(a) for a in arrays]
+    shape = map(len, arrays)
+
+    ix = np.indices(shape, dtype=int)
+    ix = ix.reshape(len(arrays), -1).T
+
+    for n, arr in enumerate(arrays):
+        ix[:, n] = arrays[n][ix[:, n]]
+
+    return ix
+
+print(cartesian(([1, 2, 3], [4, 5], [6, 7])))
+
+
+print("_______________________________________________")
+
+
+
+A = np.random.randint(0,5,(8,3))
+B = np.random.randint(0,5,(2,2))
+
+C = (A[..., np.newaxis, np.newaxis] == B)
+rows = (C.sum(axis=(1,2,3)) >= B.shape[1]).nonzero()[0]
+print(rows)
+
+print("_______________________________________________")
+
+Z = np.random.randint(0,5,(10,3))
+E = np.logical_and.reduce(Z[:,1:] == Z[:,:-1], axis=1)
+U = Z[~E]
+print(Z)
+print(U)
+print("_______________________________________________")
+
+I = np.array([0, 1, 2, 3, 15, 16, 32, 64, 128], dtype=np.uint8)
+print(np.unpackbits(I[:, np.newaxis], axis=1))
+
+
+print("_______________________________________________")
+
+Z = np.random.randint(0, 2, (6,3))
+T = np.ascontiguousarray(Z).view(np.dtype((np.void, Z.dtype.itemsize * Z.shape[1])))
+_, idx = np.unique(T, return_index=True)
+uZ = Z[idx]
+print(uZ)
+
+
+print("_______________________________________________")
+
+#np.einsum('i->', A)       # np.sum(A)
+#np.einsum('i,i->i', A, B) # A * B
+#np.einsum('i,i', A, B)    # np.inner(A, B)
+#np.einsum('i,j', A, B)    # np.outer(A, B)
+
+
+
+
+
+
 
 
 

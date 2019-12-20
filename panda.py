@@ -207,3 +207,47 @@ s1 = pd.Series(np.random.choice(['dog', 'cat', 'horse', 'bird'], n))
 s2 = pd.Series(np.linspace(1,n,n))
 ans = s2.groupby(s1).mean()
 print(ans)
+
+
+
+
+
+
+#____Dz___3_____________#
+
+# Найти евклидово расстоняие между двумя объектами Series
+s1 = pd.Series(np.random.randint(low=1, high=10, size=[n]))
+s2 = pd.Series(np.random.randint(low=1, high=10, size=[n]))
+
+ans = np.linalg.norm(s1-s2)
+ans2 = sum((s1-s2)**2)**0.5
+print(ans)
+
+# Найти индексы локальных максимумов в объекте Series
+s = pd.Series([1, 5, 7, 11, 8, 4, 12, 5, 8, 16, 8])
+dd = np.diff(np.sign(np.diff(s)))
+ans = np.where(dd == -2)[0] + 1
+print(ans)
+
+# Заменить пробелы наименее часто встречающимся символов
+str = 'bnb ber kekb dare'
+s = pd.Series(list(str))
+freq = s.value_counts()
+least_freq = freq.dropna().index[-1]
+print(''.join(s.replace(' ', least_freq)))
+
+# Создать объект Series, который содержит в индексах даты выходных дней субботы, а в значениях случайные числа от 1 до 10
+s = pd.Series(np.random.randint(low=1,high=10,size=[10]), pd.date_range('2019-01-01', periods=10, freq='W-SAT'))
+print(s)
+
+# Заполнить пропущенные даты, значением выше (заполненной даты)
+s = pd.Series([2, 5, 8, np.nan], index=pd.to_datetime(['2019-01-01', '2019-03-17', '2019-05-18', '2019-12-31']))
+ans = s.resample('D').ffill()
+print(ans)
+
+# Вычислить автокорреляцию объекта Series
+n = 20
+s = pd.Series(np.arange(n))
+s = s + np.random.normal(1, 3, n)
+autocorr = [s.autocorr(lag=i).round(2) for i in range(n)]
+print(autocorr)

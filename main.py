@@ -1,212 +1,160 @@
-def Task1_7 (x,y,z):
-  #  В школе решили набрать три новых математических класса. Так как занятия по математике у них проходят в одно и то же
-   # время, было решено выделить кабинет для каждого класса и купить в них новые парты. За каждой партой может сидеть не
-    #больше двух учеников. Известно количество учащихся в каждом из трёх классов. Сколько всего нужно закупить парт чтобы
-    #их хватило на всех учеников? Программа получает на вход три натуральных числа: количество учащихся в каждом из трех
-    #классов.
-    a = x
-    b= y
-    c= z
-    tables1 = a //2
-    if a %2 != 0:
-        tables1+=1
 
-    tables2 = b //2
-    if b %2 != 0:
-        tables2+=1
+import time
+import bcrypt
+from flask import request, abort, Flask, session
+from flask.json import jsonify
+import json
+import uuid
+import datetime
+import pytest
 
-    tables3 = c //2
-    if c %2 != 0:
-        tables3+=1
-
-    print(tables1+tables2+tables3)
-
-def Task2_9():
-    #Шахматный слон ходит по диагонали. Даны две различные клетки шахматной доски, определите, может ли слон попасть с
-    #первой клетки на вторую одним ходом.
-    a = int(input())
-    b = int(input())
-    c = int(input())
-    d = int(input())
-
-    sum = a+b+c+d
-
-    if sum % 2 != 0:
-        print("NO")
-    else:
-        print("yes")
+import requests
 
 
-def Task3_8():
-    #Даны значения двух моментов времени, принадлежащих одним и тем же суткам: часы, минуты и секунды для каждого из
-    #моментов времени. Известно, что второй момент времени наступил не раньше первого. Определите, сколько секунд прошло
-    #между двумя моментами времени.
 
-    #Программа на вход получает три целых числа: часы, минуты, секунды, задающие первый момент времени и три целых числа,
-    #задающих второй момент времени.
+session_file = "session.json"
+file = "user.txt"
 
-    #Выведите число секунд между этими моментами времени.
-    h1 = int(input())
-    m1 = int(input())
-    s1 = int(input())
-    h2 = int(input())
-    m2 = int(input())
-    s2 = int(input())
+app = Flask(__name__)
 
-    total1 = s1 + (m1*60)+(h1*60*60)
-    total2 = s2 + (m2*60)+(h2*60*60)
-    dif = total2-total1
-    print(dif)
+@pytest.fixture()
+def client():
+    app.config["TESTING"] = True
+    with app .test_client() as client:
+        yield  client
 
-def Task4_10():
-    #По данному натуральному n ≤ 9 выведите лесенку из n ступенек, i-я ступенька состоит из чисел от 1 до i без пробелов.
-    n = int(input())
-    i = 1
-    j=1
-    while i <=n:
-        while j<=i:
-            print(j,end='')
-            j+=1
-        i+=1
-        j=1
-        print()
+def test_client(client):
+    rv = client.get('/users')
+    assert b'No end' in rv.data
 
-def Task5_4():
-    #Дана строка, состоящая ровно из двух слов, разделенных пробелом. Переставьте эти слова местами.
-    #Результат запишите в строку и выведите получившуюся строку.
-    a = input()
-    b=a.split();
-    b.insert(1,' ')
-    print(type(b))
-    b.reverse()
-    c = ''.join(b)
-    print(c)
 
-def Task6_2():
-    #Дано целое число, не меньшее 2. Выведите его наименьший натуральный делитель, отличный от 1.
-    x = int(input())
-    for i in range(2, x+1):
-        if not x % i:
-            print(i)
+def mock_pred(s: str)->str:
+    return "None"
+
+def write_session(user_data: dict):
+    last = read_session()
+    f = open(session_file, 'w')
+    last.append(user_data)
+    f.write(json.dumps(last))
+    f.close()
+
+
+def read_session() -> dict:
+    f = open(session_file,'r')
+    data = json.load(f)
+    f.close()
+    print(type(data))
+    print(data)
+    return data
+
+def change_name(name,new_name):
+    data = read_session()
+    for i in data:
+        if i['name'] == name:
+            i['name'] = new_name
             break
+    f = open(session_file, 'w')
+    f.write(json.dumps(data))
+    f.close()
 
-def Task7_8():
-    #Дан список, упорядоченный по неубыванию элементов в нем. Определите, сколько в нем различных элементов.
-    a = [int(i) for i in input().split()]
-    num_distinct = 1
-    for i in range(0, len(a) - 1):
-        if a[i] != a[i + 1]:
-            num_distinct += 1
-    print(num_distinct)
+@app.route("/users")
+def get():
+    d = read_session()
+    s = ' '
+    for i in d:
+        s = s + str(i['name']) + ' '
+    return s
 
-def Task8_4():
-    #Дано действительное положительное число a и целое неотрицательное число n.
-#   Вычислите an не используя циклы, возведение в степень через ** и функцию math.pow(), а используя рекуррентное соотношение a^n=a⋅a^n-1.
-    def power(a, n):
-        if n==0:
-            return 1
-        return a*power(a, n-1)
+@app.route("/auth", methods = ['POST'])
+def get_hash():
+    if not request.json or not 'name' in request.json or not 'pass' in request.json:
 
-    a = int(input())
-    n = int(input())
-    print(power(a,n))
+        abort(400)
 
-def Task9_4():
-    #Дано число n. Создайте массив размером n×n и заполните его по следующему правилу. На главной диагонали должны быть
-   # записаны числа 0. На двух диагоналях, прилегающих к главной, числа 1. На следующих двух диагоналях числа 2, и т.д.
-    n = int(input())
-    a = [[0] * n for i in range(n)]
-    for i in range(n):
-        row = i*(-1)
-        for j in range(n):
-            if row <=0:
-                a[i][j] = row*(-1)
-            else:
-                a[i][j] = row
-            row+=1
-    for row in a:
-        print(' '.join([str(elem) for elem in row]))
+    data = read_session()
+    input_pass = request.json['pass']
+    for i in data:
+        hash_password = i['pass'].encode(errors = 'surrogateescape')
+        if bcrypt.checkpw(input_pass.encode(errors = 'surrogateescape'),hash_password):
+            f = open(file, 'w')
 
-def Task10_3():
-    #Даны два списка чисел. Найдите все числа, которые входят как в первый, так и во второй список и выведите их
-    # в порядке возрастания.
-    a = set(int(i) for i in input().split())
-    b = set(int(i) for i in input().split())
-    c = sorted(a&b)
-    print(c)
+            uniq_str = uuid.uuid4().hex[:6].upper()
+            f.write(uniq_str)
+            f.close()
+            return {"ok":uniq_str}
 
-def Task11_4():
-    #В файловую систему одного суперкомпьютера проник вирус, который сломал контроль за правами
-# доступа к файлам. Для каждого файла известно, с какими действиями можно к нему обращаться:
-# запись W,
-# чтение R,
-# запуск X.
-# В первой строке содержится число N — количество файлов содержащихся в данной файловой системе.
-# В следующих N строчках содержатся имена файлов и допустимых с ними операций, разделенные пробелами.
-# Далее указано чиcло M — количество запросов к файлам. В последних M строках указан запрос вида Операция Файл.
-# К одному и тому же файлу может быть применено любое колличество запросов.
-#
-# Вам требуется восстановить контроль над правами доступа к файлам
-# (ваша программа для каждого запроса должна будет возвращать OK если над файлом выполняется допустимая операция,
-# или же Access denied, если операция недопустима.
+        else:
+            return {"error":"not authorized"}
 
-    a = int(input())
-    b = []
-    for i in range(a):
-        b.append(input().split())
-    
-
-    dictlist=[]
-
-    for i in range(len(b)):
-        if (len(b[i])-1) == 1:
-            dictlist.append({b[i][1]:b[i][0]})
-        elif (len(b[i])-1) == 2:
-             dictlist.append({b[i][1]:b[i][0],b[i][2]:b[i][0]})
-        elif (len(b[i])-1) == 3:
-             dictlist.append({b[i][1]:b[i][0],b[i][2]:b[i][0],b[i][3]:b[i][0]})
-    print(dictlist)
-
-    comdict = {'R':'read','W':'write','X':'execute'}
-    print(comdict)
+@app.route("/user/<name>", methods = ['POST'])
+def get_user(name):
 
 
-    a = int(input())
-    b = []
-    for i in range(a):
-        b.append(input().split())
-    print(b)
-    for i in range(len(b)):
-        if b[i][0]  == 'read':
-            try:
-                for j in range(len(dictlist)):
-                    it = list(dictlist[j].items())
-                    if it[0][1] == b[i][1]:
-                        if dictlist[j]['R'] == b[i][1]:
-                            print("OK")
-
-            except KeyError:
-                print('Access denied')
+    in_str = request.headers['auth']
+    print(in_str)
+    f = open(file, 'r')
+    un = f.read()
+    print(un)
+    if in_str == un:
+        change_name(name,request.json['name'])
+        return "ok"
+    else:
+        return {"error":"not authorized"}
 
 
-        elif b[i][0] == 'write':
-            try:
-                for j in range(len(dictlist)):
-                    it = list(dictlist[j].items())
-                    if it[0][1] == b[i][1]:
-                        if dictlist[j]['W'] == b[i][1]:
-                            print("OK")
-            except KeyError:
-                print('Access denied')
+    # data = read_session()
+    # input_pass = request.json['pass']
+    # for i in data:
+    #     hash_password = i['pass'].encode(errors = 'surrogateescape')
+    #     if bcrypt.checkpw(input_pass.encode(errors = 'surrogateescape'),hash_password):
+    #         uniq_str = uuid.uuid4().hex[:6].upper()
+    #         return {"ok":uniq_str}
+    #     else:
+    #         return {"error":"not authorized"}
+    return name
+
+@app.route("/test", methods = ['POST'])
+def hh():
+    return jsonify(request.headers['auth'])
 
 
-        elif b[i][0] == 'execute':
-            try:
-                for j in range(len(dictlist)):
-                    it = list(dictlist[j].items())
-                    if it[0][1] == b[i][1]:
-                        if dictlist[j]['X'] == b[i][1]:
-                            print("OK")
+def mock_pred(s: str)->str:
+    return "None"
 
-            except KeyError:
-                print('Access denied')
+def mock_Upper(s: str) -> str:
+    return s.upper()
+
+# @api.route("/<name>_<passw>")
+# class Predict(Resource):
+#     def get(self, name, passw):
+#         t = time.time()
+#         cr_pass = bcrypt.hashpw(str.encode(passw),bcrypt.gensalt())
+#         print(cr_pass)
+#         write_session({"name":name, "pass":str(cr_pass), "time":t})
+#         return mock_Upper("predict done!")
+
+@app.route('/user', methods = ['POST'])
+def create_task():
+    if not request.json or not 'name' in request.json or not 'pass' in request.json:
+
+        abort(400)
+
+    t = time.time()
+    print(request.json['pass'])
+    print(type(request.json['pass']))
+    print(str.encode(request.json['pass']))
+    print(type(str.encode(request.json['pass'])))
+    cr_pass = bcrypt.hashpw(str.encode(request.json['pass']),bcrypt.gensalt())
+    # print(request.json)
+    # print(cr_pass)
+    write_session({"name":request.json['name'], "pass":cr_pass.decode(errors = 'surrogateescape'), "time":t})
+    return mock_Upper("user done!")
+
+if __name__ == "__main__":
+    app.secret_key = "key"
+    app.permanent_session_lifetime = datetime.timedelta(days=365)
+    app.run()
+
+
+
+
